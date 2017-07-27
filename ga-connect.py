@@ -6,7 +6,11 @@ from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
 
-SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
+SCOPES = [
+    'https://www.googleapis.com/auth/analytics.readonly',
+    'https://www.googleapis.com/auth/analytics.edit',
+    'https://www.googleapis.com/auth/analytics.manage.users'
+]
 DISCOVERY_URI = ('https://analyticsreporting.googleapis.com/$discovery/rest')
 CLIENT_SECRETS_PATH = 'client_secrets.json' # Path to client_secrets.json file.
 VIEW_ID = '<REPLACE_WITH_VIEW_ID>'
@@ -43,3 +47,33 @@ def initialize_analyticsreporting():
     analytics = build('analytics', 'v4', http=http, discoveryServiceUrl=DISCOVERY_URI)
 
     return analytics
+
+
+def print_response(response):
+    """Parses and prints the Analytics Reporting API V4 response"""
+
+    for report in response.get('reports', []):
+      columnHeader = report.get('columnHeader', {})
+      dimensionHeaders = columnHeader.get('dimensions', [])
+      metricHeaders = columnHeader.get('metricHeader', {}).get('metricHeaderEntries', [])
+      rows = report.get('data', {}).get('rows', [])
+
+      for row in rows:
+        dimensions = row.get('dimensions', [])
+        dateRangeValues = row.get('metrics', [])
+
+        for header, dimension in zip(dimensionHeaders, dimensions):
+          print header + ': ' + dimension
+
+        for i, values in enumerate(dateRangeValues):
+          print 'Date range (' + str(i) + ')'
+          for metricHeader, value in zip(metricHeaders, values.get('values')):
+            print metricHeader.get('name') + ': ' + value
+
+
+def main():
+    pass
+
+
+if __name__ == "__main__":
+    main()
