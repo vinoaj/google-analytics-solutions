@@ -160,6 +160,14 @@ def print_properties(properties):
         print(property_name.ljust(max_len_name), '|', property_id.rjust(max_len_id), '|')
 
 
+def get_views(analytics, account_id, property_id):
+    views = analytics.management().profiles().list(
+        accountId=account_id,
+        webPropertyId=property_id).execute()
+
+    return views
+
+
 def print_response(response):
     """Parses and prints the Analytics Reporting API V4 response"""
 
@@ -188,15 +196,19 @@ def print_response(response):
 
 def main():
     service_v3 = initialize_analytics_service(3)
+
     # service_v4 = initialize_analytics_service()
     # print(dir(service_v3))
+
     accounts = get_accounts(service_v3)
     print_accounts(accounts)
     account_id = int(input('Select Account ID #> '))
-    properties = get_properties(service_v3, account_id)
-    # property_id = int(input('Select Property ID #> '))
-    print_properties(properties)
 
+    properties = get_properties(service_v3, account_id)
+    print_properties(properties)
+    property_id = int(input('Select Property ID #> '))
+
+    views = get_views(service_v3, property_id)
 
 
 if __name__ == "__main__":
