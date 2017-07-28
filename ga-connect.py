@@ -12,7 +12,8 @@ SCOPES = [
     'https://www.googleapis.com/auth/analytics.manage.users'
 ]
 DISCOVERY_URI = ('https://analyticsreporting.googleapis.com/$discovery/rest')
-CLIENT_SECRETS_PATH = 'client_secrets.json' # Path to client_secrets.json file.
+CLIENT_SECRETS_PATH = 'client_secrets.json'
+FILE_STORAGE_PATH = 'analyticsreporting.dat'
 VIEW_ID = '<REPLACE_WITH_VIEW_ID>'
 
 
@@ -37,16 +38,26 @@ def initialize_analyticsreporting():
     # If the credentials don't exist or are invalid run through the native client
     # flow. The Storage object will ensure that if successful the good
     # credentials will get written back to a file.
-    storage = file.Storage('analyticsreporting.dat')
+    storage = file.Storage(FILE_STORAGE_PATH)
     credentials = storage.get()
     if credentials is None or credentials.invalid:
         credentials = tools.run_flow(flow, storage, flags)
-        http = credentials.authorize(http=httplib2.Http())
+
+    http = credentials.authorize(http=httplib2.Http())
 
     # Build the service object.
     analytics = build('analytics', 'v4', http=http, discoveryServiceUrl=DISCOVERY_URI)
 
     return analytics
+
+
+def list_accounts(analytics):
+    accounts = analytics.management().accounts().list().execute();
+
+    if accounts.get('items'):
+        account = accounts.get('items')[0]
+        account_id = account.get('id')
+        print(account_id)
 
 
 def print_response(response):
@@ -77,6 +88,7 @@ def print_response(response):
 
 def main():
     a = initialize_analyticsreporting()
+    list_accounts(a)
 
 
 if __name__ == "__main__":
