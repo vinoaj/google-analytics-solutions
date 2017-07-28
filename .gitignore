@@ -105,3 +105,6 @@ pip-selfcheck.json
 
 # PyCharm
 .idea/
+
+#Google
+client_secret\.json
