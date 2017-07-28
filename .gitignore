@@ -108,4 +108,5 @@ pip-selfcheck.json
 
 #Google
 analyticsreporting.dat
+analytics.dat
 client_secrets\.json
