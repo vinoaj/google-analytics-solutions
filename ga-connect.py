@@ -84,7 +84,7 @@ def get_accounts(analytics):
 
 def print_accounts(accounts):
     lens_id = [len('Account ID')]
-    lens_name = []
+    lens_name = [len('Account Name')]
     accounts_copy = accounts
     account_details_by_name = {}
 
@@ -115,6 +115,49 @@ def print_accounts(accounts):
         account_id = account.get('id')
         account_name = account.get('name')
         print(account_name.ljust(max_len_name), '|', account_id.rjust(max_len_id), '|')
+
+
+def get_properties(analytics, account_id):
+    properties = analytics.management().webproperties().list(
+        accountId=account_id).execute().get('items')
+
+    print(properties)
+    return properties
+
+
+def print_properties(properties):
+    lens_id = [len('Property ID')]
+    lens_name = [len('Property Name')]
+    properties_copy = properties
+    property_details_by_name = {}
+
+    for property in properties_copy:
+        property_id = property.get('id')
+        property_name = property.get('name')
+        property_details_by_name[property_name] = {
+            'property_id': property_id,
+            'property': property
+        }
+        lens_id.append(len(property_id))
+        lens_name.append(len(property_name))
+
+    max_len_id = max(lens_id)
+    max_len_name = max(lens_name)
+
+    # Sort keys by name
+    property_names = sorted(property_details_by_name.keys())
+
+    # print(len('Account ID'), max_len_id)
+    # print(max_len_id, max_len_name)
+
+    print('Property Name'.ljust(max_len_name), '|', 'Property ID'.ljust(max_len_id), '|')
+    # print('=' * (max_len_name + max_len_id + 2))
+
+    for property_name in property_names:
+        property = property_details_by_name[property_name]['property']
+        property_id = property.get('id')
+        property_name = property.get('name')
+        print(property_name.ljust(max_len_name), '|', property_id.rjust(max_len_id), '|')
 
 
 def print_response(response):
@@ -149,6 +192,11 @@ def main():
     # print(dir(service_v3))
     accounts = get_accounts(service_v3)
     print_accounts(accounts)
+    account_id = int(input('Select Account ID #> '))
+    properties = get_properties(service_v3, account_id)
+    # property_id = int(input('Select Property ID #> '))
+    print_properties(properties)
+
 
 
 if __name__ == "__main__":
