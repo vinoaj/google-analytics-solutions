@@ -107,4 +107,5 @@ pip-selfcheck.json
 .idea/
 
 #Google
+analyticsreporting.dat
 client_secrets\.json
