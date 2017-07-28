@@ -107,4 +107,4 @@ pip-selfcheck.json
 .idea/
 
 #Google
-client_secret\.json
+client_secrets\.json
