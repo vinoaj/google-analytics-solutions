@@ -1,7 +1,6 @@
 import argparse
-
-from apiclient.discovery import build
 import httplib2
+from apiclient.discovery import build
 from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
@@ -11,12 +10,12 @@ SCOPES = [
     'https://www.googleapis.com/auth/analytics.edit',
     'https://www.googleapis.com/auth/analytics.manage.users'
 ]
-# DISCOVERY_URI = ('https://analyticsreporting.googleapis.com/$discovery/rest')
+
 # For authentication
+# https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 CLIENT_SECRETS_PATH = 'client_secrets.json'
 # Credentials are stored in this file
 FILE_STORAGE_PATH = 'analyticsreporting.dat'
-# VIEW_ID = '<REPLACE_WITH_VIEW_ID>'
 
 
 def initialize_analytics_service(api_version=4):
@@ -30,8 +29,8 @@ def initialize_analytics_service(api_version=4):
         CLIENT_SECRETS_PATH, scope=SCOPES,
         message=tools.message_if_missing(CLIENT_SECRETS_PATH))
 
-    # Prepare credentials, and authorize HTTP object with them.
-    # If the credentials don't exist or are invalid run through the native client
+    # Prepare credentials, and authorize HTTP object with them. If the
+    # credentials don't exist or are invalid run through the native client
     # flow. The Storage object will ensure that if successful the good
     # credentials will get written back to a file.
     storage = file.Storage(FILE_STORAGE_PATH)
@@ -76,7 +75,7 @@ def print_accounts(accounts):
     max_len_id = max(lens_id)
     max_len_name = max(lens_name)
 
-    #Sort keys by name
+    # Sort keys by name
     account_names = sorted(account_details_by_name.keys())
 
     # print(len('Account ID'), max_len_id)
@@ -170,20 +169,20 @@ def print_response(response):
 
 
 def main():
-    service_v3 = initialize_analytics_service(3)
+    # service_v3 = initialize_analytics_service(3)
 
-    # service_v4 = initialize_analytics_service()
+    service_v4 = initialize_analytics_service()
     # print(dir(service_v3))
 
-    accounts = get_accounts(service_v3)
+    accounts = get_accounts(service_v4)
     print_accounts(accounts)
     account_id = int(input('Select Account ID #> '))
 
-    properties = get_properties(service_v3, account_id)
+    properties = get_properties(service_v4, account_id)
     print_properties(properties)
     property_id = int(input('Select Property ID #> '))
 
-    views = get_views(service_v3, property_id)
+    views = get_views(service_v4, property_id)
 
 
 if __name__ == "__main__":

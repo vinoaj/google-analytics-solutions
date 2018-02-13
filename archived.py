@@ -1,3 +1,4 @@
+# DISCOVERY_URI = ('https://analyticsreporting.googleapis.com/$discovery/rest')
 """
 def initialize_analytics_service_v3():
     flags = get_flags()
