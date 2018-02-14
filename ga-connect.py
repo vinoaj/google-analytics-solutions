@@ -1,11 +1,13 @@
 import argparse
 import httplib2
+import pandas as pd
 from apiclient.discovery import build
 from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
 
-SCOPES = [
+# https://developers.google.com/identity/protocols/googlescopes#analyticsv3
+GOOGLE_ANALYTICS_SCOPES = [
     'https://www.googleapis.com/auth/analytics.readonly',
     'https://www.googleapis.com/auth/analytics.edit',
     'https://www.googleapis.com/auth/analytics.manage.users'
@@ -26,7 +28,7 @@ def initialize_analytics_service(api_version=4):
 
     # Set up a Flow object to be used if we need to authenticate.
     flow = client.flow_from_clientsecrets(
-        CLIENT_SECRETS_PATH, scope=SCOPES,
+        CLIENT_SECRETS_PATH, scope=GOOGLE_ANALYTICS_SCOPES,
         message=tools.message_if_missing(CLIENT_SECRETS_PATH))
 
     # Prepare credentials, and authorize HTTP object with them. If the
@@ -57,6 +59,22 @@ def get_accounts(analytics):
 
 
 def print_accounts(accounts):
+    print(accounts)
+
+    col_headers = accounts[0].keys()
+    df = pd.DataFrame(columns=col_headers).set_index('id')
+    # df = pd.DataFrame()
+
+    for account in accounts:
+        print('AAAAAAA')
+        print(df)
+        account_df = pd.io.json.json_normalize(account).set_index('id')
+        df = df.append(account_df)
+        # df = df.append(pd.DataFrame(account).set_index('id'))
+
+    df.sort_values('name', inplace=True)
+    print(df.name)
+
     lens_id = [len('Account ID')]
     lens_name = [len('Account Name')]
     accounts_copy = accounts
@@ -77,9 +95,6 @@ def print_accounts(accounts):
 
     # Sort keys by name
     account_names = sorted(account_details_by_name.keys())
-
-    # print(len('Account ID'), max_len_id)
-    # print(max_len_id, max_len_name)
 
     print('Account Name'.ljust(max_len_name), '|', 'Account ID'.ljust(max_len_id), '|')
     # print('=' * (max_len_name + max_len_id + 2))
@@ -169,20 +184,19 @@ def print_response(response):
 
 
 def main():
-    # service_v3 = initialize_analytics_service(3)
+    analytics_v3 = initialize_analytics_service(3)
+    analytics_v4 = initialize_analytics_service()
+    # print(dir(analytics_v4))
 
-    service_v4 = initialize_analytics_service()
-    # print(dir(service_v3))
-
-    accounts = get_accounts(service_v4)
+    accounts = get_accounts(analytics_v3)
     print_accounts(accounts)
     account_id = int(input('Select Account ID #> '))
 
-    properties = get_properties(service_v4, account_id)
+    properties = get_properties(analytics_v3, account_id)
     print_properties(properties)
     property_id = int(input('Select Property ID #> '))
 
-    views = get_views(service_v4, property_id)
+    views = get_views(analytics_v3, property_id)
 
 
 if __name__ == "__main__":
