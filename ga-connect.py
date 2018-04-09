@@ -20,11 +20,18 @@ CLIENT_SECRETS_PATH = 'client_secrets.json'
 FILE_STORAGE_PATH = 'analyticsreporting.dat'
 
 
-def initialize_analytics_service(api_version=4):
+def initialize_analytics_service(api_version=4, no_local_webserver=False):
+    # v3 required for Management API
+    # v4 required for the Core Reporting API
+
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         parents=[tools.argparser])
-    flags = parser.parse_args([])
+
+    if no_local_webserver is True:
+        flags = parser.parse_args(['--noauth_local_webserver'])
+    else:
+        flags = parser.parse_args([])
 
     # Set up a Flow object to be used if we need to authenticate.
     flow = client.flow_from_clientsecrets(
@@ -157,6 +164,15 @@ def get_views(analytics, account_id, property_id):
     return views
 
 
+def print_views(views):
+    print(views)
+    views_copy = views
+
+    for view in views_copy.get('items'):
+        print("{view_id} - {view_name} \n".format(view_id=view.get('id'),
+                                                  view_name=view.get('name')))
+
+
 def print_response(response):
     """Parses and prints the Analytics Reporting API V4 response"""
 
@@ -184,8 +200,8 @@ def print_response(response):
 
 
 def main():
-    analytics_v3 = initialize_analytics_service(3)
-    analytics_v4 = initialize_analytics_service()
+    analytics_v3 = initialize_analytics_service(3, False)
+    analytics_v4 = initialize_analytics_service(4, False)
     # print(dir(analytics_v4))
 
     accounts = get_accounts(analytics_v3)
@@ -194,9 +210,10 @@ def main():
 
     properties = get_properties(analytics_v3, account_id)
     print_properties(properties)
-    property_id = int(input('Select Property ID #> '))
+    property_id = (input('Select Property ID #> '))
 
-    views = get_views(analytics_v3, property_id)
+    views = get_views(analytics_v3, account_id, property_id)
+    print_views(views)
 
 
 if __name__ == "__main__":
