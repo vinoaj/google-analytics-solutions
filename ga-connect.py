@@ -5,6 +5,8 @@ from apiclient.discovery import build
 from oauth2client import client
 from oauth2client import file
 from oauth2client import tools
+from pprint import pprint
+from vvgalib.reportbuilder import GAReportBuilder, GAReportParser
 
 # https://developers.google.com/identity/protocols/googlescopes#analyticsv3
 GOOGLE_ANALYTICS_SCOPES = [
@@ -199,6 +201,25 @@ def print_response(response):
                     pass
 
 
+def main2():
+    analytics_v4 = initialize_analytics_service(4, False)
+    rb = GAReportBuilder('174820262')
+    rb.add_date_range('2018-05-01', 'today')
+    rb.add_dimensions(['ga:dateHourMinute', 'ga:eventCategory',
+                       'ga:eventAction',
+                      'ga:eventLabel', 'ga:dimension1']);
+    rb.add_metric('ga:hits')
+    rbr = rb.build_request()
+    pprint(rbr)
+
+    r = analytics_v4.reports().batchGet(body=rbr).execute()
+    pprint(r)
+
+    rp = GAReportParser(r['reports'][0])
+    csv = rp.get_csv()
+    print(csv)
+
+
 def main():
     analytics_v3 = initialize_analytics_service(3, False)
     analytics_v4 = initialize_analytics_service(4, False)
@@ -217,4 +238,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main2()
