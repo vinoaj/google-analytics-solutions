@@ -9,7 +9,7 @@ VIEW_ID = 59236323
 def main_2():
     ga_api_wrapper = GAAPIWrapper()
     mapi = GAManagementAPI(ga_api_wrapper, ACCOUNT_ID, WEB_PROPERTY_ID)
-    mapi.get_accounts()
+    mapi.print_views_list()
 
 
 
