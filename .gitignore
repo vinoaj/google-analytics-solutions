@@ -110,3 +110,4 @@ pip-selfcheck.json
 analyticsreporting.dat
 analytics.dat
 client_secrets\.json
+service_account.json
