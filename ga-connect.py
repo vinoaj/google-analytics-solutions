@@ -1,10 +1,10 @@
 import argparse
+import googleapiclient.discovery
 import httplib2
 import pandas as pd
-from apiclient.discovery import build
-from oauth2client import client
-from oauth2client import file
-from oauth2client import tools
+from googleapiclient.discovery import build
+# from google.oauth2 import service_account
+from oauth2client import client, file, service_account, tools
 from pprint import pprint
 from vvgalib.reportbuilder import GAReportBuilder, GAReportParser
 
@@ -18,8 +18,19 @@ GOOGLE_ANALYTICS_SCOPES = [
 # For authentication
 # https://developers.google.com/api-client-library/python/guide/aaa_client_secrets
 CLIENT_SECRETS_PATH = 'client_secrets.json'
+# If using a service account
+SERVICE_ACCOUNT_FILE = 'service_account.json'
 # Credentials are stored in this file
 FILE_STORAGE_PATH = 'analyticsreporting.dat'
+
+
+def initialize_analytics_service_with_service_account(api_version=4):
+    credentials = service_account.ServiceAccountCredentials.from_json_keyfile_name(
+        SERVICE_ACCOUNT_FILE, scopes=GOOGLE_ANALYTICS_SCOPES)
+    version_str = 'v{}'.format(api_version)
+    analytics = googleapiclient.discovery.build('analytics', version_str,
+                                               credentials=credentials)
+    return analytics
 
 
 def initialize_analytics_service(api_version=4, no_local_webserver=False):
@@ -201,6 +212,24 @@ def print_response(response):
                     pass
 
 
+def main3():
+    analytics_v4 = initialize_analytics_service_with_service_account(4)
+    print(analytics_v4)
+
+    # analytics_v4 = initialize_analytics_service(4, False)
+    rb = GAReportBuilder('163983863')
+    rb.add_date_range('2018-05-01', 'today')
+    rb.add_dimensions(['ga:dateHourMinute', 'ga:eventCategory',
+                       'ga:eventAction',
+                       'ga:eventLabel', 'ga:dimension1']);
+    rb.add_metric('ga:hits')
+    rbr = rb.build_request()
+    pprint(rbr)
+
+    r = analytics_v4.reports().batchGet(body=rbr).execute()
+    pprint(r)
+
+
 def main2():
     analytics_v4 = initialize_analytics_service(4, False)
     rb = GAReportBuilder('174820262')
@@ -238,4 +267,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main2()
+    main3()
