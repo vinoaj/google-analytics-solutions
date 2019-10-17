@@ -8,7 +8,11 @@ class GAReportBuilder:
         self.dimensions = []
         self.metrics = []
         self.order_bys = []
+        self.request_body = None
         self.api_client = None
+
+    def set_api_client(self, api_client):
+        self.api_client = api_client
 
     def add_date_range(self, start_date='7daysAgo', end_date='today'):
         self.date_ranges.append({
@@ -73,7 +77,14 @@ class GAReportBuilder:
             'dimensions': self.build_request_dimensions_array()
         }
         request_body['reportRequests'].append(report_request)
+        self.request_body = request_body
         return request_body
+
+    def run_request(self):
+        results = self.api_client.reports().batchGet(
+            body=self.request_body).execute()
+
+        return results
 
 
 class GAReportParser:

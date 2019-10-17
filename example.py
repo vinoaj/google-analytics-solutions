@@ -6,6 +6,26 @@ ACCOUNT_ID = 3172639
 WEB_PROPERTY_ID = 'UA-3172639-1'
 VIEW_ID = 59236323
 
+
+def get_analytics_service():
+    """
+    Instantiate a connection to the Google Analytics Reporting API
+    :return:
+    """
+    # Load up credentials
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        KEY_FILE_LOCATION, scopes=GOOGLE_ANALYTICS_SCOPES)
+
+    # Build the service object
+    # cache_discovery=False is important within a Google Cloud Function,
+    #   otherwise the library looks for a local credentials file,
+    #   and eventually crashes
+    service_ga = build('analyticsreporting', 'v4', credentials=credentials,
+                       cache_discovery=False)
+
+    return service_ga
+
+
 def main_2():
     ga_api_wrapper = GAAPIWrapper()
     mapi = GAManagementAPI(ga_api_wrapper, ACCOUNT_ID, WEB_PROPERTY_ID)
