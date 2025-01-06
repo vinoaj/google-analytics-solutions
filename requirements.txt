@@ -28,7 +28,7 @@ google-cloud-firestore==1.4.0
 google-cloud-storage==1.19.1
 google-resumable-media==0.4.1
 googleapis-common-protos==1.6.0
-grpcio==1.53.0
+grpcio==1.53.2
 httplib2==0.13.1
 idna==2.8
 ipykernel==5.1.0
